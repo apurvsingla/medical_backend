@@ -93,6 +93,6 @@ module.exports.selectTimeSlot = async (req,res) => {
     })
     let selectTime = new Time({time: req.body.time});
     let ti = slot.filter((i) => i !== selectTime.time);
-    console.log(ti)
-    return res.status(200).json({message: 'Time slot successfully booked'})
+    slot = [...ti]
+    return res.status(200).json({message: `Time slot: ${req.body.time} successfully booked`})
 }
