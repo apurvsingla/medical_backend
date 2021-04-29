@@ -9,25 +9,19 @@ const doctorsSchema = new mongoose.Schema({
         type: Date ,
         required: true
     },
-    timeRange: {
+    timeRange: [{
         type: String,
         required: true
-    }
-    //comment belong to a user
-    // user: {
-    //     type: mongoose.Schema.Types.ObjectId,
-    //     ref: 'User'
-    // },
-    // post: {
-    //     type: mongoose.Schema.Types.ObjectId,
-    //     ref: 'Post'
-    // },
-    // likes: [{
-    //     type: mongoose.Schema.Types.ObjectId,
-    //     ref: 'Like'
-    // }]
+    }],
+    timeSlots: [{
+        type: String,
+    }]
 }, {
-    timestamps: true
+    timestamps: true,
+    writeConcern: {
+        j: true,
+        wtimeout: 1000
+      }
 });
 
 
