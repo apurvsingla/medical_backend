@@ -119,7 +119,7 @@ module.exports.selectTimeSlot = async (req,res) => {
     })
     let selectTime = new Time({time: req.body.time});
     let ti = slot.filter((i) => i !== selectTime.time);
-    slot = [...ti]
+    slot = [...ti];
     await Doctor.findOneAndUpdate({availableSlots: req.body.date}, { $set: { timeSlot: slot } })
     return res.status(200).json({message: `Time slot: ${req.body.time} successfully booked`})
 }
