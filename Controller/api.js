@@ -3,38 +3,12 @@ let slot = [];
 const Time = require('../Models/timeSlots');
 
 module.exports.availableSlots = async (req,res) => {
-    // await Doctor.deleteMany();
-    // await Time.deleteMany()
     try {
         let doctor = await Doctor.find({availableSlots: req.body.date});
-        let n = [];
-        let newTime = doctor.map(i => {
-            console.log(i.timeRange)
-            i.timeRange.map(j => {
-                n.push(j.split(','));
-            })
-        })
-        let t = [];
-        slot = []
-        console.log(n)
-        n.map((i) => {
-            i.map(j => {
-                t.push(j.split('-'))
-            })
-        });
-        t.map(i => {
-            let t1 = Number(i[0]);
-            let t2 = Number(i[1]);
-            while(t1 !== t2){
-                slot.push(`${t1+'-'+Number(t1+0.5)}`)
-                t1 = t1 + .5
-            }
-        })
         if(doctor){
             return res.status(200).json({
                 success: true,
                 data: doctor,
-                time: slot
             });
         }else{
             return res.status(400).json({
@@ -92,38 +66,34 @@ module.exports.doctorTime = (req,res) => {
 
 module.exports.selectTimeSlot = async (req,res) => {
     let doctor = await Doctor.find({availableSlots: req.body.date});
-    let n = [];
-    let newTime = doctor.map(i => {
-        if(i.timeSlots){
+    if(doctor){
+        let selectTime = req.body.time;
+        let newTime = ''
+        doctor.map(i => {
+            slot.push(i.timeSlots)
             i.timeSlots.map(j => {
-                n.push(j.split(','));
-
+                if(j === selectTime){
+                    newTime = j;
+                }
             })
+        });
+        var newArr = [];
+        for(var i = 0; i < slot.length; i++)
+        {
+            newArr = newArr.concat(slot[i]);
         }
-    })
-    let t = [];
-    slot = []
-    console.log(n)
-    n.map((i) => {
-        i.map(j => {
-            t.push(j.split('-'))
-        })
-    });
-    t.map(i => {
-        let t1 = Number(i[0]);
-        let t2 = Number(i[1]);
-        while(t1 !== t2){
-            slot.push(`${t1+'-'+Number(t1+0.5)}`)
-            t1 = t1 + .5
+
+        let ind = newArr.indexOf(newTime);
+        newArr.splice(ind,1);
+        let d = await Doctor.findOneAndUpdate({availableSlots: req.body.date}, { $set: { timeSlots: newArr } })
+        if(d){
+            return res.status(200).json({message: `Time slot: ${req.body.time} successfully booked`})
+        }else{
+            return res.status(400).json({message: 'Sorry no time slot available for this time'})
         }
-    })
-    let selectTime = req.body.time;
-    let ti = slot.filter((i) => i !== selectTime.time);
-    slot = [...ti];
-    let d = await Doctor.findOneAndUpdate({timeSlot: req.body.time}, { $set: { timeSlot: slot } })
-    if(d){
-        return res.status(200).json({message: `Time slot: ${req.body.time} successfully booked`})
     }else{
         return res.status(400).json({message: 'Sorry no time slot available for this time'})
     }
+    
+    
 }
